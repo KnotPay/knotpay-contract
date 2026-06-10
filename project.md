@@ -1,438 +1,74 @@
+# KnotPay QR Payment Network
 
+KnotPay is a Stellar-based merchant payment platform that enables customers to pay merchants by scanning QR codes. The organization is split into three repositories so each layer is modular, auditable, and independently deployable.
 
-provide a fully project structure on how to archive this on stellar 
-QR-code payment network
+## Overview
 
-i want the org to be knotpay
-and also the org to be of 3 repo
+This repo contains the Soroban contract layer for the KnotPay platform. The contracts handle merchant registration, payment request lifecycle, fee configuration, and payment verification.
 
-For a QR-Code Payment Network on Stellar under the organization KnotPay, a clean production architecture is to split it into 3 repositories:
+## Architecture
 
-Project Overview
-KnotPay is a merchant payment network that allows customers to pay merchants by scanning QR codes.
-
-Flow:
-
-Merchant creates payment request
-
-QR code generated
-
-Customer scans QR
-
-Wallet signs Stellar payment
-
-Backend verifies transaction
-
-Merchant receives confirmation
-
-Dashboard updates in real time
-
-Supported Assets:
-
-XLM
-
-USDC
-
-Merchant-issued assets
-
-Future stablecoins
-
-Organization Structure
+```
 KnotPay/
-│
 ├── knotpay-contracts
 ├── knotpay-backend
 └── knotpay-frontend
-Repository 1: knotpay-contracts
-Purpose:
-
-Smart contracts
-
-Merchant registry
-
-Payment request creation
-
-Escrow (optional)
-
-Settlement logic
-
-Fee management
-
-Technology:
-
-Soroban
-
-Rust
-
-Stellar SDK
-
-Structure
-knotpay-contracts/
-│
-├── contracts/
-│   │
-│   ├── merchant_registry/
-│   │   ├── src/
-│   │   │   ├── lib.rs
-│   │   │   ├── storage.rs
-│   │   │   ├── types.rs
-│   │   │   ├── errors.rs
-│   │   │   └── admin.rs
-│   │
-│   ├── payment_request/
-│   │   ├── src/
-│   │   │   ├── lib.rs
-│   │   │   ├── qr.rs
-│   │   │   ├── payment.rs
-│   │   │   ├── storage.rs
-│   │   │   └── events.rs
-│   │
-│   ├── fee_manager/
-│   │   ├── src/
-│   │   │   ├── lib.rs
-│   │   │   ├── fees.rs
-│   │   │   └── admin.rs
-│
-├── tests/
-│   ├── merchant_test.rs
-│   ├── payment_test.rs
-│   └── fee_test.rs
-│
-├── scripts/
-│   ├── deploy.sh
-│   ├── initialize.sh
-│   └── upgrade.sh
-│
-├── Cargo.toml
-└── README.md
-Main Contract Features
-Merchant Registration
-register_merchant()
-Stores:
-
-Merchant {
-    merchant_id,
-    wallet,
-    business_name,
-    active
-}
-Create Payment Request
-create_request()
-Input:
-
-amount
-asset
-merchant_id
-description
-expiry
-Output:
-
-payment_id
-Verify Payment
-verify_payment()
-Checks:
-
-tx_hash
-amount
-merchant
-asset
-Platform Fees
-set_fee_rate()
-Example:
-
-0.5%
-Automatically deduct fee.
-
-Repository 2: knotpay-backend
-Purpose:
-
-APIs
-
-QR generation
-
-Stellar monitoring
-
-Webhooks
-
-Merchant management
-
-Settlement engine
-
-Technology:
-
-Node.js
-
-TypeScript
-
-PostgreSQL
-
-Redis
-
-Stellar SDK
-
-Structure
-knotpay-backend/
-│
-├── src/
-│   │
-│   ├── api/
-│   │   ├── auth/
-│   │   ├── merchant/
-│   │   ├── payments/
-│   │   ├── qr/
-│   │   └── webhooks/
-│   │
-│   ├── services/
-│   │   ├── stellar/
-│   │   ├── qr/
-│   │   ├── notification/
-│   │   ├── settlement/
-│   │   └── analytics/
-│   │
-│   ├── workers/
-│   │   ├── payment-monitor.ts
-│   │   ├── settlement-worker.ts
-│   │   └── webhook-worker.ts
-│   │
-│   ├── database/
-│   │   ├── migrations/
-│   │   ├── seeders/
-│   │   └── models/
-│   │
-│   ├── middleware/
-│   │
-│   ├── config/
-│   │
-│   └── app.ts
-│
-├── tests/
-├── docs/
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
-Database Schema
-Merchants
-merchants
-id
-wallet
-business_name
-email
-status
-created_at
-Payment Requests
-payment_requests
-id
-merchant_id
-amount
-asset
-description
-qr_data
-status
-expires_at
-Payments
-payments
-id
-payment_request_id
-tx_hash
-amount
-asset
-payer
-status
-confirmed_at
-QR Generation Logic
-Merchant enters:
-
-Amount = 25 USDC
-Backend creates:
-
-{
-  "merchant":"G....",
-  "amount":"25",
-  "asset":"USDC",
-  "memo":"KP123456"
-}
-Encoded into QR.
-
-Payment Monitoring
-Worker continuously watches Stellar.
-
-Horizon API
-↓
-Detect payment
-↓
-Match memo
-↓
-Verify amount
-↓
-Mark paid
-↓
-Notify merchant
-Webhook System
-Merchant receives:
-
-{
-  "payment_id":"123",
-  "status":"completed",
-  "amount":"25"
-}
-Repository 3: knotpay-frontend
-Purpose:
-
-Merchant dashboard
-
-Customer payment page
-
-Analytics
-
-QR display
-
-Technology:
-
-Next.js
-
-TypeScript
-
-Tailwind
-
-Stellar Wallet Kit
-
-Structure
-knotpay-frontend/
-│
-├── public/
-│
-├── src/
-│   │
-│   ├── app/
-│   │   ├── dashboard/
-│   │   ├── payments/
-│   │   ├── merchants/
-│   │   ├── settings/
-│   │   └── analytics/
-│   │
-│   ├── components/
-│   │   ├── qr/
-│   │   ├── tables/
-│   │   ├── charts/
-│   │   ├── wallet/
-│   │   └── ui/
-│   │
-│   ├── hooks/
-│   │
-│   ├── services/
-│   │   ├── api.ts
-│   │   └── stellar.ts
-│   │
-│   ├── store/
-│   │
-│   └── types/
-│
-├── tests/
-├── next.config.js
-└── README.md
-Frontend Pages
-Merchant Dashboard
-Total Sales
-Total Transactions
-Pending Payments
-Revenue Chart
-Create QR
-Merchant enters:
-
-Amount
-Asset
-Description
-Click:
-
-Generate QR
-Payment Status Page
-Shows:
-
-Waiting Payment
-Processing
-Completed
-Failed
-Expired
-Transaction History
-Filters:
-
-Today
-Week
-Month
-Asset
-Merchant
-Stellar Transaction Flow
-Merchant
-    │
-    ▼
-Create Payment Request
-    │
-    ▼
-Backend Generates QR
-    │
-    ▼
-Customer Scans QR
-    │
-    ▼
-Wallet Opens
-    │
-    ▼
-Signs Stellar Payment
-    │
-    ▼
-Stellar Network
-    │
-    ▼
-Payment Monitor Detects TX
-    │
-    ▼
-Contract Verification
-    │
-    ▼
-Merchant Dashboard Updated
-MVP Features
-Phase 1
-Merchant registration
-
-QR generation
-
-XLM payments
-
-USDC payments
-
-Transaction history
-
-Dashboard
-
-Phase 2
-Soroban payment requests
-
-Merchant fees
-
-Settlement reports
-
-Webhooks
-
-Mobile support
-
-Phase 3
-NFC payments
-
-Offline QR mode
-
-Loyalty rewards
-
-Subscription billing
-
-Multi-store merchants
-
-Cross-border settlements
-
-Repo Relationship Description
-If a grant form asks "You selected multiple repos. Please describe how they are related."
-
-Answer:
-
-The KnotPay platform is split into three repositories following a modular architecture. knotpay-contracts contains Soroban smart contracts responsible for merchant registration, payment requests, and fee management. knotpay-backend provides APIs, QR generation, Stellar transaction monitoring, settlement services, and webhook integrations. knotpay-frontend delivers the merchant dashboard and customer-facing payment interfaces. Together, the three repositories form the complete QR-code payment network built on the Stellar ecosystem.
+```
 
+### Repository roles
 
+- `knotpay-contracts` — on-chain Soroban contracts for merchant registry, payment requests, and fee management.
+- `knotpay-backend` — REST APIs, QR generation, Stellar monitoring, settlement, and webhooks.
+- `knotpay-frontend` — merchant dashboard, customer payment flow, and analytics.
+
+## Contract repo structure
+
+- `contracts/merchant_registry` — merchant onboarding and registry contract
+- `contracts/payment_request` — request creation and verification contract
+- `contracts/fee_manager` — fee configuration and calculation contract
+- `scripts/` — deployment, initialization, and upgrade helper scripts
+- `tests/` — workspace-level testing guidance
+
+## Core flow
+
+1. Merchant registers and creates a payment request.
+2. Backend generates a QR code for the request.
+3. Customer scans the QR code and sends a Stellar payment.
+4. Backend monitors Stellar transactions and verifies payment details.
+5. The payment request contract updates request state to Paid.
+6. Merchant dashboard updates with the completed payment.
+
+## Supported assets
+
+- XLM
+- USDC on Stellar
+- Merchant-issued assets
+- Future stablecoins and asset-backed tokens
+
+## Contract features
+
+### Merchant Registry
+
+- `initialize(owner)`
+- `register_merchant(merchant_id, wallet, business_name, active)`
+- `set_active(merchant_id, active)`
+- `get_merchant_by_id(merchant_id)`
+- `get_merchant_by_wallet(wallet)`
+
+### Payment Request
+
+- `create_request(request_id, merchant, amount, asset, description, expiry)`
+- `verify_payment(request_id, tx_hash, amount, asset)`
+- `cancel_request(request_id)`
+- `get_request(request_id)`
+
+### Fee Manager
+
+- `initialize(owner, fee_rate_bps)`
+- `set_fee_rate(fee_rate_bps)`
+- `get_fee_rate()`
+- `calculate_fee(amount)`
+
+## Notes
+
+This repository focuses on the contract-side implementation. Backend and frontend repos are separate and should integrate with this contract layer through Soroban contract invocations.

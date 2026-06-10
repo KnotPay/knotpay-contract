@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "contracts/merchant_registry",
+    "contracts/payment_request",
+    "contracts/fee_manager",
+]
+
+[workspace.dependencies]
+soroban-sdk = "0.15.0"

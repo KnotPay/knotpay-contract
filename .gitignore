@@ -1,0 +1,8 @@
+target/
+**/target/
+**/*.wasm
+.DS_Store
+.env
+.env.*
+*.log
+node_modules/
